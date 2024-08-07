@@ -7,7 +7,7 @@ A flutter implementation of Velopack using flutter_rust_bridge
 At the moment, Flutter has no proper way to distribute auto updates for desktop apps at the moment, apart from the Microsoft and Mac App Store.
 Velopack is an installation and auto-update framework for cross-platform desktop application, which solves this problem.
 Learn more about Velopack here: https://velopack.io/
-This project uses (flutter_rust_bridge)["https://test.com"] to call the rust implementation of Velopack.
+This project uses [flutter_rust_bridge](https://cjycode.com/flutter_rust_bridge/) to call the rust implementation of Velopack.
 
 ## Getting Started
 
@@ -64,7 +64,7 @@ Then build your flutter app:
 flutter build [windows|macos|linux] --release
 ```
 
-Then go to the directory of your release build (this can differ based on your target)
+Go to the directory of your release build (this can differ based on your target)
 
 ```shell
 cd build/windows/x64/runner
