@@ -1,24 +1,27 @@
 # velopack_flutter
 
-A flutter implementation of Velopack using flutter_rust_bridge
+[![pub package](https://img.shields.io/pub/v/velopack_flutter.svg)](https://pub.dartlang.org/packages/velopack_flutter)
 
-## Why?
+A Flutter implementation of Velopack using flutter_rust_bridge for automated desktop app updates.
 
-At the moment, Flutter has no proper way to distribute auto updates for desktop apps at the moment, apart from the Microsoft and Mac App Store.
-Velopack is an installation and auto-update framework for cross-platform desktop application, which solves this problem.
-Learn more about Velopack here: https://velopack.io/
-This project uses [flutter_rust_bridge](https://cjycode.com/flutter_rust_bridge/) to call the rust implementation of Velopack.
+## Why Velopack?
+
+Flutter currently lacks a robust solution for distributing auto-updates for desktop applications, aside from the Microsoft and Mac App Stores. Velopack addresses this gap by providing a cross-platform installation and auto-update framework for desktop applications.
+
+Learn more about Velopack at [https://velopack.io/](https://velopack.io/)
+
+This project leverages [flutter_rust_bridge](https://cjycode.com/flutter_rust_bridge/) to interface with the Rust implementation of Velopack.
 
 ## Getting Started
 
-Add the velopack dependency to your pubspec.yaml
+1. Add the velopack_flutter dependency to your `pubspec.yaml`:
 
 ```yaml
-  dependencies:
-    velopack_flutter: ^0.0.1
+dependencies:
+  velopack_flutter: ^0.0.1
 ```
 
-Import the velopack packages and add call to ``await RustLib.init();`` in the main function for your app. Furthermore, add handling of specific velo startup commands.
+2. Import the package, initialize the Rust library and handle Velopack app hooks in your `main.dart`:
 
 ```dart
 import 'package:flutter/material.dart';
@@ -28,7 +31,7 @@ Future<void> main() async {
   await RustLib.init();
   
   final veloCommands = ['--veloapp-install', '--veloapp-updated', '--veloapp-obsolete', '--veloapp-uninstall'];
-  if (veloCommands.any(args.contains)) {
+  if (veloCommands.any((cmd) => args.contains(cmd))) {
     exit(0);
   }
   
@@ -36,52 +39,52 @@ Future<void> main() async {
 }
 ```
 
-## Functions
+## API
 
-``ìsUpdateAvailable(String url)``
-Checks the specified url for an update and returns true or false but does nothing else.
-
-``updateAndRestart(String url)``
-Checks the specified url for an update, downloads and applies it, then restarts.
-
-``updateAndExit(String url)``
-Checks the specified url for an update, downloads and applies it, then exits.
-
-``waitExitThenUpdate(String url)``
-Checks the specified url for an update, downloads it and applies it after app has been closed.
-
+| Function | Description                                                                                                                  |
+|----------|------------------------------------------------------------------------------------------------------------------------------|
+| `isUpdateAvailable(String url)` | Checks the specified URL for an update and returns a boolean.                                                                |
+| `updateAndRestart(String url)` | Checks for an update, downloads and applies it, then restarts the app.                                                       |
+| `updateAndExit(String url)` | Checks for an update, downloads and applies it, then exits the app.                                                          |
+| `waitExitThenUpdate(String url)` | Checks for an update, downloads it, and applies it after the app has been closed. Will close automatically after 60 seconds. |
 
 ## Packaging
-First install .NET Core SDK 6.0 and ```vpk```
+
+1. Install .NET Core SDK 6.0 and the `vpk` tool:
 
 ```shell
 dotnet tool update -g vpk
 ```
 
-Then build your flutter app:
+2. Build your Flutter app:
 
 ```shell
 flutter build [windows|macos|linux] --release
 ```
 
-Go to the directory of your release build (this can differ based on your target)
+3. Navigate to your release build directory:
 
 ```shell
 cd build/windows/x64/runner
 ```
 
-Then use ``vpk`` to package it:
+4. Package your app using `vpk`:
 
 ```shell
-vpk pack --packId SomeId --packVersion 1.0.0 --packDir Release --mainExe yourExe.exe
+vpk pack --packId YourAppId --packVersion 1.0.0 --packDir Release --mainExe YourApp.exe
 ```
 
-Your release package should now appear in the Releases directory. You can now distribute your package.
-For more information regarding packaging and distributing see these links:
-https://docs.velopack.io/category/packaging
-https://docs.velopack.io/category/distributing
+Your release package will be generated in the `Releases` directory.
 
+For more information on packaging and distribution, refer to:
+- [Velopack Packaging Documentation](https://docs.velopack.io/category/packaging)
+- [Velopack Distribution Documentation](https://docs.velopack.io/category/distributing)
 
-## Remarks
-- The linux implementation has not been tested yet. It should theoretically work just fine but I don't have any device running linux. If you have a linux device and know this works fine, open an issue to let me know.
-- The API differs from Velopack in other languages and is not feature-complete. In the long-term it would probably make sense to keep these consistent, however I didn't have time for this yet. Feel free to open a PR!
+## Notes
+
+- The Linux implementation is currently untested. Contributions and feedback from Linux users are welcome.
+- The API may differ from Velopack implementations in other languages and is not feature-complete. In the long-term it would make sense to keep these consistent, however I didn't have time for this yet. Feel free to open a PR!
+
+## Contributing
+
+If you encounter issues, have suggestions, or want to contribute code, please open an issue or submit a pull request on this GitHub repository.
