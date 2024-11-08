@@ -11,15 +11,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
         body: Center(
           child: FutureBuilder(
-            future: isUpdateAvailable(url:'https://test.com') ,
-            builder: (context,snap) => Text(
-                'Update is available: ${snap.data}'),
+            future: isUpdateAvailable(url: 'https://test.com'),
+            builder: (context, snap) =>
+                Text('Update is available: ${snap.data}'),
           ),
         ),
       ),

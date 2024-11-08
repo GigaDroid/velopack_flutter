@@ -1,6 +1,6 @@
 name: velopack_flutter
 description: "A flutter implementation of Velopack to enable easy distribution and auto-updates for flutter apps"
-version: 0.0.2
+version: 0.1.0
 repository: https://github.com/GigaDroid/velopack_flutter
 homepage: https://velopack.io/
 
@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_rust_bridge: 2.2.0
+  flutter_rust_bridge: 2.6.0
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
