@@ -7,25 +7,21 @@ pub fn init_app() {
     VelopackApp::build().run();
 }
 
-fn create_update_manager(url: &str) -> Result<UpdateManager<sources::HttpSource>> {
+fn create_update_manager(url: &str) -> Result<UpdateManager, Error> {
     let source = sources::HttpSource::new(url);
-    UpdateManager::new(source, None)
+    UpdateManager::new(source, None, None)
 }
 
 pub fn is_update_available(url: String) -> Result<bool> {
     let um = create_update_manager(&url)?;
-    let updates = um.check_for_updates()?;
-    Ok(updates.is_some())
+    let update_check = um.check_for_updates()?;
+    Ok(matches!(update_check, UpdateCheck::UpdateAvailable(..)))
 }
 
 fn check_and_download_updates(url: &str) -> Result<Option<UpdateInfo>> {
     let um = create_update_manager(url)?;
-
-    let updates = um.check_for_updates()?;
-    if let Some(updates) = updates {
-        um.download_updates(&updates, |progress| {
-            println!("Download progress: {}%", progress);
-        })?;
+    if let UpdateCheck::UpdateAvailable(updates) = um.check_for_updates().unwrap() {
+        um.download_updates(&updates, None)?;
         Ok(Some(updates))
     } else {
         Ok(None)
@@ -35,7 +31,7 @@ fn check_and_download_updates(url: &str) -> Result<Option<UpdateInfo>> {
 pub fn update_and_restart(url: String) -> Result<()> {
     if let Some(updates) = check_and_download_updates(&url)? {
         let um = create_update_manager(&url)?;
-        um.apply_updates_and_restart(&updates, RestartArgs::None)?;
+        um.apply_updates_and_restart(&updates)?;
     }
     Ok(())
 }
@@ -51,7 +47,7 @@ pub fn update_and_exit(url: String) -> Result<()> {
 pub fn wait_exit_then_update(url: String, silent: bool, restart: bool) -> Result<()> {
     if let Some(updates) = check_and_download_updates(&url)? {
         let um = create_update_manager(&url)?;
-        um.wait_exit_then_apply_updates(&updates, silent, restart, RestartArgs::None)?;
+        um.wait_exit_then_apply_updates(&updates, silent, restart,[""])?;
     }
     Ok(())
 }
