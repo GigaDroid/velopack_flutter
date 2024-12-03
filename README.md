@@ -14,27 +14,33 @@ This project leverages [flutter_rust_bridge](https://cjycode.com/flutter_rust_br
 
 ## Getting Started
 
-1. Add the velopack_flutter dependency to your `pubspec.yaml`:
+1. Make sure rust is installed: https://www.rust-lang.org/tools/install
+
+2. Add the velopack_flutter dependency to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  velopack_flutter: ^0.0.1
+  velopack_flutter: ^0.1.0
 ```
 
-2. Import the package, initialize the Rust library and handle Velopack app hooks in your `main.dart`:
+3. Import the package, initialize the Rust library and handle Velopack app hooks in your main.dart:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:velopack_flutter/velopack_flutter.dart';
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
   await RustLib.init();
-  
+
   final veloCommands = ['--veloapp-install', '--veloapp-updated', '--veloapp-obsolete', '--veloapp-uninstall'];
   if (veloCommands.any((cmd) => args.contains(cmd))) {
     exit(0);
   }
-  
+
+  /* You can now call the API functions shown in the API section. E.g isUpdateAvailable(url: ...);
+     Do note that the API functions will only function correctly in a vpk packed release.
+     isUpdateAvailable and the rest will just throw an exception if you call them while debugging.
+  */
   runApp(const MyApp());
 }
 ```
@@ -79,6 +85,34 @@ Your release package will be generated in the `Releases` directory.
 For more information on packaging and distribution, refer to:
 - [Velopack Packaging Documentation](https://docs.velopack.io/category/packaging)
 - [Velopack Distribution Documentation](https://docs.velopack.io/category/distributing)
+
+## Using Github releases as your updates location
+There is an issue (https://github.com/velopack/velopack/issues/254) in the velopack repo about adding full api support for github releases. In the meantime 
+you can still use github releases with a few workarounds:
+### Download step (before packing the release) 
+Run the download command before packing to include the latest information from your github releases
+```shell
+vpk download github --repoUrl https://github.com/{orgOrUser}/{repoName}
+```
+Then pack as normal.
+
+#### Uploading
+```shell
+vpk upload github --repoUrl https://github.com/{orgOrUser}/{repoName} --publish --releaseName YourDesiredReleaseName --tag v1.0.0 --token your_github_token
+```
+
+#### Using the API in your flutter app
+velopack expects all the files to be available at the given url. One way to accomplish this with github releases is
+to specify  `${repoUrl}releases/download/${tagName}/` as the url to isUpdateAvailable or any other api function.
+This does require you to parse out the tag for the latest release manually yourself, e.g.:  
+```dart
+final url = Uri.parse('${repoUrl}releases/latest/');
+final response = await http.get(url);
+if (response.statusCode == 200) {
+  final data = json.decode(response.body);
+  final tag_name = data['tag_name']
+}
+```
 
 ## Notes
 
