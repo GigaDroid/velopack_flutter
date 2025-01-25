@@ -12,15 +12,16 @@ import 'frb_generated.io.dart'
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API
-class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
+class VelopackRustLib extends BaseEntrypoint<VelopackRustLibApi,
+    VelopackRustLibApiImpl, VelopackRustLibWire> {
   @internal
-  static final instance = RustLib._();
+  static final instance = VelopackRustLib._();
 
-  RustLib._();
+  VelopackRustLib._();
 
   /// Initialize flutter_rust_bridge
   static Future<void> init({
-    RustLibApi? api,
+    VelopackRustLibApi? api,
     BaseHandler? handler,
     ExternalLibrary? externalLibrary,
   }) async {
@@ -34,7 +35,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   /// Initialize flutter_rust_bridge in mock mode.
   /// No libraries for FFI are loaded.
   static void initMock({
-    required RustLibApi api,
+    required VelopackRustLibApi api,
   }) {
     instance.initMockImpl(
       api: api,
@@ -48,12 +49,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   static void dispose() => instance.disposeImpl();
 
   @override
-  ApiImplConstructor<RustLibApiImpl, RustLibWire> get apiImplConstructor =>
-      RustLibApiImpl.new;
+  ApiImplConstructor<VelopackRustLibApiImpl, VelopackRustLibWire>
+      get apiImplConstructor => VelopackRustLibApiImpl.new;
 
   @override
-  WireConstructor<RustLibWire> get wireConstructor =>
-      RustLibWire.fromExternalLibrary;
+  WireConstructor<VelopackRustLibWire> get wireConstructor =>
+      VelopackRustLibWire.fromExternalLibrary;
 
   @override
   Future<void> executeRustInitializers() async {
@@ -78,7 +79,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   );
 }
 
-abstract class RustLibApi extends BaseApi {
+abstract class VelopackRustLibApi extends BaseApi {
   Future<void> crateApiVelopackInitApp();
 
   Future<bool> crateApiVelopackIsUpdateAvailable({required String url});
@@ -91,8 +92,9 @@ abstract class RustLibApi extends BaseApi {
       {required String url, required bool silent, required bool restart});
 }
 
-class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
-  RustLibApiImpl({
+class VelopackRustLibApiImpl extends VelopackRustLibApiImplPlatform
+    implements VelopackRustLibApi {
+  VelopackRustLibApiImpl({
     required super.handler,
     required super.wire,
     required super.generalizedFrbRustBinding,

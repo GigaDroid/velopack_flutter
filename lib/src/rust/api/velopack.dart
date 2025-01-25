@@ -9,15 +9,15 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `check_and_download_updates`, `create_update_manager`
 
 Future<bool> isUpdateAvailable({required String url}) =>
-    RustLib.instance.api.crateApiVelopackIsUpdateAvailable(url: url);
+    VelopackRustLib.instance.api.crateApiVelopackIsUpdateAvailable(url: url);
 
 Future<void> updateAndRestart({required String url}) =>
-    RustLib.instance.api.crateApiVelopackUpdateAndRestart(url: url);
+    VelopackRustLib.instance.api.crateApiVelopackUpdateAndRestart(url: url);
 
 Future<void> updateAndExit({required String url}) =>
-    RustLib.instance.api.crateApiVelopackUpdateAndExit(url: url);
+    VelopackRustLib.instance.api.crateApiVelopackUpdateAndExit(url: url);
 
 Future<void> waitExitThenUpdate(
         {required String url, required bool silent, required bool restart}) =>
-    RustLib.instance.api.crateApiVelopackWaitExitThenUpdate(
+    VelopackRustLib.instance.api.crateApiVelopackWaitExitThenUpdate(
         url: url, silent: silent, restart: restart);

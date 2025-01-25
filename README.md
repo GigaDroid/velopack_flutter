@@ -14,13 +14,12 @@ This project leverages [flutter_rust_bridge](https://cjycode.com/flutter_rust_br
 
 ## Getting Started
 
-1. Make sure rust is installed: https://www.rust-lang.org/tools/install
-
+1. Make sure rust is installed: <https://www.rust-lang.org/tools/install>
 2. Add the velopack_flutter dependency to your `pubspec.yaml`:
 
 ```yaml
-dependencies:
-  velopack_flutter: ^0.1.0
+  dependencies:
+    velopack_flutter: ^0.1.0
 ```
 
 3. Import the package, initialize the Rust library and handle Velopack app hooks in your main.dart:
@@ -30,7 +29,7 @@ import 'package:flutter/material.dart';
 import 'package:velopack_flutter/velopack_flutter.dart';
 
 Future<void> main(List<String> args) async {
-  await RustLib.init();
+  await VelopackRustLib.init();
 
   final veloCommands = ['--veloapp-install', '--veloapp-updated', '--veloapp-obsolete', '--veloapp-uninstall'];
   if (veloCommands.any((cmd) => args.contains(cmd))) {
@@ -44,6 +43,18 @@ Future<void> main(List<String> args) async {
   runApp(const MyApp());
 }
 ```
+
+## Use with another rust library
+
+If your project have already existing rust bindings. You'll certainly need to have a distinct library class name to prevent name conflicts.
+
+This is what Velopack Flutter is doing by setting the following values in `flutter_rust_bridge.yaml` to make the class name "unique" and avoid conflicts.
+
+```yaml
+  dart_entrypoint_class_name: VelopackRustLib
+```
+
+**We recommend you to do the same on your own rust bindings.**
 
 ## API
 
@@ -68,43 +79,64 @@ dotnet tool update -g vpk
 flutter build [windows|macos|linux] --release
 ```
 
-3. Navigate to your release build directory:
+3. Navigate to your release build directory & package your app using `vpk`:
+
+### Windows
 
 ```shell
 cd build/windows/x64/runner
-```
-
-4. Package your app using `vpk`:
-
-```shell
 vpk pack --packId YourAppId --packVersion 1.0.0 --packDir Release --mainExe YourApp.exe
 ```
+
+### MacOS
+
+```shell
+cd build/macos/Build/Products/Release
+vpk pack -u "xyz.appName.companyName" -v 1.0.0 \
+            -p "./YourApp.app" \
+            --channel "osx-channelName" \
+            --mainExe "Application Binary" \
+            --noPortable --packTitle "Application Title" --signEntitlements "$(pwd)/macos/Runner/Release.entitlements" \
+            --signAppIdentity "Developer ID Application: (Your Name)" \
+            --signInstallIdentity "Developer ID Installer: (Your Name)" \
+            --notaryProfile "notary-profile-name" \
+```
+
 
 Your release package will be generated in the `Releases` directory.
 
 For more information on packaging and distribution, refer to:
+
 - [Velopack Packaging Documentation](https://docs.velopack.io/category/packaging)
 - [Velopack Distribution Documentation](https://docs.velopack.io/category/distributing)
 
 ## Using Github releases as your updates location
-There is an issue (https://github.com/velopack/velopack/issues/254) in the velopack repo about adding full api support for github releases. In the meantime 
+
+There is an issue (<https://github.com/velopack/velopack/issues/254>) in the velopack repo about adding full api support for github releases. In the meantime
 you can still use github releases with a few workarounds:
-### Download step (before packing the release) 
+
+### Download step (before packing the release)
+
 Run the download command before packing to include the latest information from your github releases
+
 ```shell
 vpk download github --repoUrl https://github.com/{orgOrUser}/{repoName}
 ```
+
 Then pack as normal.
 
 #### Uploading
+
 ```shell
 vpk upload github --repoUrl https://github.com/{orgOrUser}/{repoName} --publish --releaseName YourDesiredReleaseName --tag v1.0.0 --token your_github_token
 ```
 
 #### Using the API in your flutter app
+
 velopack expects all the files to be available at the given url. One way to accomplish this with github releases is
 to specify  `${repoUrl}releases/download/${tagName}/` as the url to isUpdateAvailable or any other api function.
 This does require you to parse out the tag for the latest release manually yourself, e.g.:  
+
 ```dart
 final url = Uri.parse('${repoUrl}releases/latest/');
 final response = await http.get(url);
