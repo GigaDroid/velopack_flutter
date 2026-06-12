@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_rust_bridge: ^2.11.0
+  flutter_rust_bridge: 2.11.1
   hooks: ^1.0.3
   native_toolchain_rust: ^1.0.3
   plugin_platform_interface: ^2.0.2
