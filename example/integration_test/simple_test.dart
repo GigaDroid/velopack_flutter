@@ -4,5 +4,6 @@ import 'package:velopack_flutter/velopack_flutter.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  setUpAll(() async => await VelopackRustLib.init());
+  setUpAll(
+      () async => await initializeVelopack(url: 'http://localhost/releases'));
 }

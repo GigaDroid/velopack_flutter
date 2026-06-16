@@ -1,11 +1,11 @@
-use std::sync::{mpsc};
+use std::sync::mpsc;
 use std::sync::OnceLock;
 
-use anyhow::Result;
+use anyhow::{bail, Result};
 use flutter_rust_bridge::frb;
-use velopack::{Error, UpdateCheck, UpdateInfo, UpdateManager, VelopackApp, sources};
+use velopack::{sources, Error, UpdateCheck, UpdateInfo, UpdateManager, VelopackApp};
 
-use crate::{frb_generated::StreamSink};
+use crate::frb_generated::StreamSink;
 
 static VELOPACK_URL: OnceLock<String> = OnceLock::new();
 
@@ -16,13 +16,21 @@ pub fn init_app() {
 }
 
 pub fn init_velopack(url: String) -> Result<()> {
-    VELOPACK_URL.set(url).ok();
+    if let Err(url) = VELOPACK_URL.set(url) {
+        if VELOPACK_URL.get() == Some(&url) {
+            return Ok(());
+        }
+
+        bail!("Velopack is already initialized with a different URL");
+    }
+
     Ok(())
 }
 
 fn get_update_manager() -> Result<UpdateManager, Error> {
-    let url = VELOPACK_URL.get()
-        .ok_or(Error::Other("Velopack not initialized. Call initVelopack() first.".into()))?;
+    let url = VELOPACK_URL.get().ok_or(Error::Other(
+        "Velopack not initialized. Call initializeVelopack() first.".into(),
+    ))?;
     let source = sources::HttpSource::new(url);
     UpdateManager::new(source, None, None)
 }
@@ -47,7 +55,9 @@ pub fn current_version() -> Result<String> {
     Ok(um.get_current_version_as_string())
 }
 
-pub fn check_and_download_updates_with_progress(progress_sink: StreamSink<i16>) -> Result<Option<UpdateInfo>> {
+pub fn check_and_download_updates_with_progress(
+    progress_sink: StreamSink<i16>,
+) -> Result<Option<UpdateInfo>> {
     let um = get_update_manager()?;
     if let UpdateCheck::UpdateAvailable(updates) = um.check_for_updates().unwrap() {
         // Create a channel for progress messages
@@ -56,10 +66,10 @@ pub fn check_and_download_updates_with_progress(progress_sink: StreamSink<i16>) 
         um.download_updates(&updates, Some(sx))?;
 
         std::thread::spawn(move || {
-                while let Ok(progress) = rx.recv() {
-                    let _ = progress_sink.add(progress);
-                }
-            });
+            while let Ok(progress) = rx.recv() {
+                let _ = progress_sink.add(progress);
+            }
+        });
 
         Ok(Some(*updates))
     } else {
@@ -96,7 +106,7 @@ pub fn update_and_exit() -> Result<()> {
 pub fn wait_exit_then_update(silent: bool, restart: bool) -> Result<()> {
     if let Some(updates) = check_and_download_updates()? {
         let um = get_update_manager()?;
-        um.wait_exit_then_apply_updates(&updates, silent, restart,[""])?;
+        um.wait_exit_then_apply_updates(&updates, silent, restart, [""])?;
     }
     Ok(())
 }

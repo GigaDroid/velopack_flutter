@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:velopack_flutter/velopack_flutter.dart';
 
 Future<void> main(List<String> args) async {
-  await VelopackRustLib.init();
-  await initVelopack(url: 'http://localhost/releases');
+  await initializeVelopack(url: 'http://localhost/releases');
   runApp(const MyApp());
 }
 
