@@ -14,29 +14,29 @@ This project leverages [flutter_rust_bridge](https://cjycode.com/flutter_rust_br
 
 ## Getting Started
 
-1. Make sure rust is installed: <https://www.rust-lang.org/tools/install>
+1. Make sure Rust is installed: <https://www.rust-lang.org/tools/install>
 2. Add the velopack_flutter dependency to your `pubspec.yaml`:
 
 ```yaml
   dependencies:
-    velopack_flutter: ^0.1.0
+    velopack_flutter: ^0.2.0
 ```
 
-3. Import the package, initialize the Rust library and handle Velopack app hooks in your main.dart:
+3. Import the package, initialize Velopack and handle Velopack app hooks in your main.dart:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:velopack_flutter/velopack_flutter.dart';
 
 Future<void> main(List<String> args) async {
-  await VelopackRustLib.init();
+  await initializeVelopack(url: 'https://example.com/releases');
 
   final veloCommands = ['--veloapp-install', '--veloapp-updated', '--veloapp-obsolete', '--veloapp-uninstall'];
   if (veloCommands.any((cmd) => args.contains(cmd))) {
     exit(0);
   }
 
-  /* You can now call the API functions shown in the API section. E.g isUpdateAvailable(url: ...);
+  /* You can now call the API functions shown in the API section. E.g isUpdateAvailable();
      Do note that the API functions will only function correctly in a vpk packed release.
      isUpdateAvailable and the rest will just throw an exception if you call them while debugging.
   */
@@ -44,9 +44,9 @@ Future<void> main(List<String> args) async {
 }
 ```
 
-## Use with another rust library
+## Use with another Rust library
 
-If your project have already existing rust bindings. You'll certainly need to have a distinct library class name to prevent name conflicts.
+If your project has existing Rust bindings, you'll need to have a distinct library class name to prevent name conflicts.
 
 This is what Velopack Flutter is doing by setting the following values in `flutter_rust_bridge.yaml` to make the class name "unique" and avoid conflicts.
 
@@ -54,20 +54,20 @@ This is what Velopack Flutter is doing by setting the following values in `flutt
   dart_entrypoint_class_name: VelopackRustLib
 ```
 
-**We recommend you to do the same on your own rust bindings.**
+**We recommend you do the same on your own Rust bindings.**
 
 ## API
 
 | Function | Description                                                                                                                  |
 |----------|--------------------------------------------------------------|
-| `init_velopack(String url)` | Initializes Velopack with the update server URL.                                                      |
-| `is_update_available()` | Checks if an update is available.                                                                     |
-| `get_latest_update_info()` | Gets detailed information about the latest available update.                                          |
-| `current_version()` | Returns the current application version as a string.                                                  |
-| `check_and_download_updates_with_progress(StreamSink<int> progressSink)` | Checks for updates, downloads them, and streams progress (0-100) to the provided sink.                |
-| `update_and_restart()` | Applies downloaded updates and restarts the application.                                              |
-| `update_and_exit()` | Applies downloaded updates and exits the application.                                                 |
-| `wait_exit_then_update(bool silent, bool restart)` | Waits for the app to exit, then applies updates. If `restart` is true, the app will restart after applying updates. Use `silent` to suppress UI messages. |
+| `initializeVelopack({required String url})` | Initializes the bridge and configures Velopack with the update server URL.                                                      |
+| `isUpdateAvailable()` | Checks if an update is available.                                                                     |
+| `getLatestUpdateInfo()` | Gets detailed information about the latest available update.                                          |
+| `currentVersion()` | Returns the current application version as a string.                                                  |
+| `checkAndDownloadUpdatesWithProgress()` | Checks for updates, downloads them, and returns a progress stream.                |
+| `updateAndRestart()` | Applies downloaded updates and restarts the application.                                              |
+| `updateAndExit()` | Applies downloaded updates and exits the application.                                                 |
+| `waitExitThenUpdate({required bool silent, required bool restart})` | Waits for the app to exit, then applies updates. If `restart` is true, the app will restart after applying updates. Use `silent` to suppress UI messages. |
 
 ## Packaging
 
@@ -92,7 +92,7 @@ cd build/windows/x64/runner
 vpk pack --packId YourAppId --packVersion 1.0.0 --packDir Release --mainExe YourApp.exe
 ```
 
-### MacOS
+### macOS
 
 ```shell
 cd build/macos/Build/Products/Release
@@ -114,14 +114,14 @@ For more information on packaging and distribution, refer to:
 - [Velopack Packaging Documentation](https://docs.velopack.io/category/packaging)
 - [Velopack Distribution Documentation](https://docs.velopack.io/category/distributing)
 
-## Using Github releases as your updates location
+## Using GitHub releases as your updates location
 
-There is an issue (<https://github.com/velopack/velopack/issues/254>) in the velopack repo about adding full api support for github releases. In the meantime
-you can still use github releases with a few workarounds:
+There is an issue (<https://github.com/velopack/velopack/issues/254>) in the Velopack repo about adding full API support for GitHub releases. In the meantime
+you can still use GitHub releases with a few workarounds:
 
 ### Download step (before packing the release)
 
-Run the download command before packing to include the latest information from your github releases
+Run the download command before packing to include the latest information from your GitHub releases
 
 ```shell
 vpk download github --repoUrl https://github.com/{orgOrUser}/{repoName}
@@ -135,10 +135,10 @@ Then pack as normal.
 vpk upload github --repoUrl https://github.com/{orgOrUser}/{repoName} --publish --releaseName YourDesiredReleaseName --tag v1.0.0 --token your_github_token
 ```
 
-#### Using the API in your flutter app
+#### Using the API in your Flutter app
 
-velopack expects all the files to be available at the given url. One way to accomplish this with github releases is
-to specify  `${repoUrl}releases/download/${tagName}/` as the url to isUpdateAvailable or any other api function.
+Velopack expects all the files to be available at the given URL. One way to accomplish this with GitHub releases is
+to specify `${repoUrl}releases/download/${tagName}/` as the URL passed to `initializeVelopack`.
 This does require you to parse out the tag for the latest release manually yourself, e.g.:  
 
 ```dart

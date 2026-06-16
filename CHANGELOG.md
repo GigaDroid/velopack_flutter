@@ -2,13 +2,14 @@
 
 ## 0.2.0
 
-* upgrade rust valopack crate to 1.2.0
-* upgrade FRB to 2.12.0
-* added dart types mirroring for UpdateInfo
-* initialize velopack with URL just once after init
-* added download progress stream sink to Flutter
-* used build hooks instead of cargokit
-* better example UI
+* Upgrade Rust Velopack crate to 1.2.0
+* Upgrade FRB to 2.12.0
+* Added Dart types mirroring for UpdateInfo
+* Initialize Velopack with URL just once after init
+* Added Dart initializeVelopack helper for one-step setup
+* Added download progress stream sink to Flutter
+* Used build hooks instead of CargoKit
+* Better example UI
 
 ## 0.1.0
 
