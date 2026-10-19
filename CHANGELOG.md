@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+* Fixed the Rust build hook to skip builds when code assets are disabled
+
 ## 0.3.2
 
 * Added top-level desktop platform metadata so pub.dev correctly lists Linux, macOS, and Windows support
